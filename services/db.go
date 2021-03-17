@@ -27,7 +27,7 @@ func OpenDB(dsn string, config *gorm.Config, maxIdleConns, maxOpenConns int, mod
 		return
 	}
 
-	if sqlDB, err = db.DB(); err != nil {
+	if sqlDB, err = db.DB(); err == nil {
 		sqlDB.SetMaxIdleConns(maxIdleConns)
 		sqlDB.SetMaxOpenConns(maxOpenConns)
 	} else {

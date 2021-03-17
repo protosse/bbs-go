@@ -3,8 +3,8 @@ package services
 import (
 	"bbs-go/common/constants"
 	"bbs-go/models"
-	"bbs-go/util"
 	"bbs-go/util/date"
+	"bbs-go/util/str"
 	"time"
 )
 
@@ -39,7 +39,7 @@ func (s *user) Create(u *models.User) (err error) {
 }
 
 func (s *user) CreateToken(userId int64) (string, error) {
-	token := util.UUID()
+	token := str.UUID()
 	expiredAt := time.Now().Add(time.Hour * time.Duration(24) * constants.DefaultTokenExporeDays)
 	userToken := &models.UserToken{
 		Token:      token,

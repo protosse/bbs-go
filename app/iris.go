@@ -1,7 +1,7 @@
 package app
 
 import (
-	"bbs-go/config"
+	"bbs-go/common/config"
 	"bbs-go/controllers/api"
 	"fmt"
 
@@ -12,9 +12,9 @@ import (
 	"github.com/kataras/iris/v12/mvc"
 )
 
-func InitIris(conf *config.Config) {
+func InitIris() {
 	app := iris.New()
-	app.Logger().SetLevel(conf.LogLevel)
+	app.Logger().SetLevel(config.Config.LogLevel)
 	app.Use(recover.New())
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Options{
@@ -29,8 +29,8 @@ func InitIris(conf *config.Config) {
 		a.Party("/login").Handle(new(api.LoginController))
 	})
 
-	app.Run(
-		iris.Addr(fmt.Sprintf("%s:%d", conf.Host, conf.Port)),
+	_ = app.Run(
+		iris.Addr(fmt.Sprintf("%s:%d", config.Config.Host, config.Config.Port)),
 		iris.WithoutServerError(iris.ErrServerClosed),
 		iris.WithConfiguration(iris.Configuration{
 			EnableOptimizations:     true,

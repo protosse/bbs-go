@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Config struct {
+var Config = struct {
 	LogLevel string `yaml:"logLevel"`
 	LogFile  string `yaml:"logFile"`
 	Host     string `yaml:"host"`
@@ -31,13 +31,12 @@ type Config struct {
 		Port     string `yaml:"port"`
 		Password string `yaml:"password"`
 	} `yaml:"redis"`
-}
+}{}
 
-func Init(fileName string) (*Config, error) {
-	config := &Config{}
+func Init(fileName string) error {
 	yamlFile, err := ioutil.ReadFile(fileName)
 	if err == nil {
-		err = yaml.Unmarshal(yamlFile, config)
+		err = yaml.Unmarshal(yamlFile, &Config)
 	}
-	return config, err
+	return err
 }

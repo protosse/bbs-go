@@ -15,7 +15,7 @@ func IsUsername(username string) (err error) {
 	}
 
 	pattern := `^[a-zA-Z][0-9a-zA-Z_-]{4,11}$`
-	matched, _ := regexp.MatchString(pattern, username)
+	matched, err := regexp.MatchString(pattern, str)
 	if !matched {
 		err = errors.New("用户名必须由5-12位(数字、字母、_、-)组成，且必须以字母开头")
 		return
@@ -30,7 +30,7 @@ func IsEmail(email string) (err error) {
 		return
 	}
 	pattern := `^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$`
-	matched, _ := regexp.MatchString(pattern, email)
+	matched, _ := regexp.MatchString(pattern, str)
 	if !matched {
 		err = errors.New("邮箱格式不符合规范")
 	}
