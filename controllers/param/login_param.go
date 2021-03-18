@@ -1,9 +1,15 @@
 package param
 
 type PostSignupReq struct {
-	Username UserName `json:"username"`
-	Email    Email    `json:"email"`
-	Password Password `json:"password"`
+	Username string `json:"username" validate:"required,username"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,gte=6,lte=30"`
+}
+
+type PostLoginReq struct {
+	Username string `json:"username" validate:"username"`
+	Email    string `json:"email" validate:"email"`
+	Password string `json:"password" validate:"required,gte=6,lte=30"`
 }
 
 type PostSignupRes struct {

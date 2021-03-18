@@ -1,8 +1,8 @@
 package str
 
 import (
-	"regexp"
 	"strings"
+	"unicode/utf8"
 
 	uuid "github.com/iris-contrib/go.uuid"
 )
@@ -12,7 +12,6 @@ func UUID() string {
 	return strings.ReplaceAll(u.String(), "-", "")
 }
 
-func RemoveUnmarshalerDecoder(str string) string {
-	re := regexp.MustCompile(`unmarshalerDecoder: ([\s\S]+), error found`)
-	return re.FindAllStringSubmatch(str, -1)[0][1]
+func Len(str string) int {
+	return utf8.RuneCountInString(str)
 }

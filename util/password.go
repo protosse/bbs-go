@@ -11,3 +11,8 @@ func EncodePassword(raw string) (hash string) {
 	}
 	return
 }
+
+func ValidatePassword(raw, input string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(raw), []byte(input))
+	return err == nil
+}

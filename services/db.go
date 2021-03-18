@@ -1,9 +1,9 @@
 package services
 
 import (
+	"bbs-go/util/logging"
 	"database/sql"
 
-	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -23,7 +23,7 @@ func OpenDB(dsn string, config *gorm.Config, maxIdleConns, maxOpenConns int, mod
 	}
 
 	if db, err = gorm.Open(mysql.Open(dsn), config); err != nil {
-		logrus.Errorf("open database failed: %v", err)
+		logging.Errorf("open database failed: %v", err)
 		return
 	}
 
@@ -31,11 +31,11 @@ func OpenDB(dsn string, config *gorm.Config, maxIdleConns, maxOpenConns int, mod
 		sqlDB.SetMaxIdleConns(maxIdleConns)
 		sqlDB.SetMaxOpenConns(maxOpenConns)
 	} else {
-		logrus.Error(err)
+		logging.Errorf("get db failed: %v", err)
 	}
 
 	if err = db.AutoMigrate(models...); err != nil {
-		logrus.Errorf("auto migrate failed: %v", err)
+		logging.Errorf("auto migrate failed: %v", err)
 	}
 	return
 }

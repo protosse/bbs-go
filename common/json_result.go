@@ -33,7 +33,7 @@ func JsonSuccess() *JsonResult {
 
 func JsonTipError(tip string) *JsonResult {
 	return &JsonResult{
-		ErrorCode: 1000,
+		ErrorCode: TipErrorCode,
 		Message:   tip,
 		Success:   false,
 	}

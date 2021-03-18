@@ -19,7 +19,7 @@ type user struct {
 
 func (s *user) GetByUsername(username string) *models.User {
 	ret := &models.User{}
-	if err := DB().Take(ret, "username = ?", username); err != nil {
+	if err := DB().Take(ret, "user_name = ?", username).Error; err != nil {
 		return nil
 	}
 	return ret
@@ -27,7 +27,7 @@ func (s *user) GetByUsername(username string) *models.User {
 
 func (s *user) GetByEmail(email string) *models.User {
 	ret := &models.User{}
-	if err := DB().Take(ret, "email = ?", email); err != nil {
+	if err := DB().Take(ret, "email = ?", email).Error; err != nil {
 		return nil
 	}
 	return ret

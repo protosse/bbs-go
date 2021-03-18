@@ -6,7 +6,9 @@ require (
 	github.com/Joker/hpp v1.0.0 // indirect
 	github.com/Shopify/goreferrer v0.0.0-20210305184658-1a4fe54f556d // indirect
 	github.com/flosch/pongo2/v4 v4.0.2 // indirect
-	github.com/go-playground/validator/v10 v10.4.1 // indirect
+	github.com/go-playground/locales v0.13.0
+	github.com/go-playground/universal-translator v0.17.0
+	github.com/go-playground/validator/v10 v10.4.1
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible
