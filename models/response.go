@@ -1,10 +1,5 @@
 package models
 
-type ResponseModelMap interface {
-	FromModel(interface{}) *ResponseModelMap
-	Dic() map[string]interface{}
-}
-
 type UserResponse struct {
 	Id               int64  `json:"id"`
 	UserName         string `json:"userName"`         // 用户名
@@ -22,10 +17,21 @@ type UserResponse struct {
 	CreateTime       int64  `json:"createTime"`       // 创建时间
 }
 
-func (u UserResponse) FromModel(i interface{}) *ResponseModelMap {
-	panic("implement me")
-}
-
-func (u UserResponse) Dic() map[string]interface{} {
-	panic("implement me")
+func NewUserResponseFromModel(m *User) *UserResponse {
+	u := &UserResponse{}
+	u.Id = m.Id
+	u.UserName = m.UserName.String
+	u.Email = m.Email.String
+	u.EmailVerified = m.EmailVerified
+	u.NickName = m.NickName
+	u.Avatar = m.Avatar
+	u.Description = m.Description
+	u.Status = m.Status
+	u.TopicCount = m.TopicCount
+	u.CommentCount = m.CommentCount
+	u.Roles = m.Roles
+	u.Type = m.Type
+	u.ForbiddenEndTime = m.ForbiddenEndTime
+	u.CreateTime = m.CreateTime
+	return u
 }

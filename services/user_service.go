@@ -1,11 +1,10 @@
 package services
 
 import (
-	"bbs-go/common/constants"
 	"bbs-go/models"
-	"bbs-go/util/date"
-	"bbs-go/util/str"
-	"time"
+	"bbs-go/repositories"
+	"github.com/iris-contrib/middleware/jwt"
+	"github.com/kataras/iris/v12"
 )
 
 var User = newUserService()
@@ -17,40 +16,26 @@ func newUserService() *user {
 type user struct {
 }
 
+func (s *user) GetBy(id int64) *models.User {
+	return repositories.User.Get(DB(), id)
+}
+
 func (s *user) GetByUsername(username string) *models.User {
-	ret := &models.User{}
-	if err := DB().Take(ret, "user_name = ?", username).Error; err != nil {
-		return nil
-	}
-	return ret
+	return repositories.User.GetByUsername(DB(), username)
 }
 
 func (s *user) GetByEmail(email string) *models.User {
-	ret := &models.User{}
-	if err := DB().Take(ret, "email = ?", email).Error; err != nil {
-		return nil
-	}
-	return ret
+	return repositories.User.GetByEmail(DB(), email)
 }
 
-func (s *user) Create(u *models.User) (err error) {
-	err = DB().Create(u).Error
-	return
+func (s *user) Create(m *models.User) (err error) {
+	return repositories.User.Create(DB(), m)
 }
 
-func (s *user) CreateToken(userId int64) (string, error) {
-	token := str.UUID()
-	expiredAt := time.Now().Add(time.Hour * time.Duration(24) * constants.DefaultTokenExporeDays)
-	userToken := &models.UserToken{
-		Token:      token,
-		UserId:     userId,
-		ExpiredAt:  date.Timestamp(expiredAt),
-		Status:     constants.StatusOk,
-		CreateTime: date.NowTimestamp(),
-	}
-	err := DB().Create(userToken).Error
-	if err != nil {
-		return "", err
-	}
-	return token, nil
+func (s *user) GetCurrent(ctx iris.Context) *models.User {
+	jwtInfo := ctx.Values().Get("jwt").(*jwt.Token)
+	claims := jwtInfo.Claims.(jwt.MapClaims)
+	//TODO: no userId
+	userId := int64(claims["userId"].(float64))
+	return s.GetBy(userId)
 }

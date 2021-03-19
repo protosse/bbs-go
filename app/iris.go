@@ -3,8 +3,8 @@ package app
 import (
 	"bbs-go/common/config"
 	"bbs-go/controllers/api"
+	"bbs-go/middleware"
 	"fmt"
-
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/logger"
@@ -25,8 +25,17 @@ func InitIris() {
 		AllowedHeaders:   []string{"*"},
 	}))
 
-	mvc.Configure(app.Party("/api"), func(a *mvc.Application) {
-		a.Party("/login").Handle(new(api.LoginController))
+	apiRouter := app.Party("/api")
+
+	auth := middleware.JwtHandler().Serve
+	{
+		mvc.Configure(apiRouter.Party("/user", auth), func(a *mvc.Application) {
+			a.Handle(new(api.UserController))
+		})
+	}
+	mvc.Configure(apiRouter.Party("/user"), func(a *mvc.Application) {
+		a.Register()
+		a.Handle(new(api.LoginController))
 	})
 
 	_ = app.Run(

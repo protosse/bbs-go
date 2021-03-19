@@ -2,7 +2,7 @@ package api
 
 import (
 	"bbs-go/common"
-	"bbs-go/controllers/param"
+	"bbs-go/middleware"
 	"bbs-go/models"
 	"bbs-go/services"
 	"bbs-go/util"
@@ -18,7 +18,7 @@ type LoginController struct {
 }
 
 func (c *LoginController) PostSignup() *common.JsonResult {
-	body := &param.PostSignupReq{}
+	body := &models.PostSignupReq{}
 	var err error
 	if err = c.Ctx.ReadJSON(body); err != nil {
 		return common.JsonTipError(err.Error())
@@ -52,7 +52,7 @@ func (c *LoginController) PostSignup() *common.JsonResult {
 }
 
 func (c *LoginController) PostLogin() *common.JsonResult {
-	body := &param.PostLoginReq{}
+	body := &models.PostLoginReq{}
 	var err error
 	if err = c.Ctx.ReadJSON(body); err != nil {
 		return common.JsonTipError(err.Error())
@@ -76,7 +76,24 @@ func (c *LoginController) PostLogin() *common.JsonResult {
 		return common.JsonError(common.PasswordError)
 	}
 
-	res := &param.PostLoginRes{}
+	token, err := middleware.GenerateJwtToken()
+	if err != nil {
+		return common.JsonError(common.GenerateTokenError)
+	}
 
+	res := &models.PostLoginRes{
+		UserResponse: models.NewUserResponseFromModel(user),
+		Token:        token,
+	}
+	return common.JsonData(res)
+}
+
+func (c *LoginController) GetBy(id int64) *common.JsonResult {
+	user := services.User.GetBy(id)
+	if user == nil {
+		return common.JsonError(common.UserNotExistError)
+	}
+
+	res := models.NewUserResponseFromModel(user)
 	return common.JsonData(res)
 }

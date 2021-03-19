@@ -30,13 +30,14 @@ func init() {
 		return str
 	})
 
-	registerTagMsg("username", "{0}必须由5-12位(数字、字母、_、-)组成，且必须以字母开头")
+	registerTagMsg("userNameIgnoreEmpty", userNameIgnoreEmpty, "{0}必须由5-12位(数字、字母、_、-)组成，且必须以字母开头")
+	registerTagMsg("emailIgnoreEmpty", emailIgnoreEmpty, "邮箱格式不符合规范")
 
 	_ = zhTrans.RegisterDefaultTranslations(Validate, Trans)
 }
 
-func registerTagMsg(tag, msg string) {
-	_ = Validate.RegisterValidation(tag, userName)
+func registerTagMsg(tag string, function validator.Func, msg string) {
+	_ = Validate.RegisterValidation(tag, function)
 	_ = Validate.RegisterTranslation(tag, Trans, func(ut ut.Translator) error {
 		return ut.Add(tag, msg, true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
@@ -58,18 +59,34 @@ func Valid(object interface{}) []string {
 }
 
 func ValidFirst(object interface{}) string {
-	return Valid(object)[0]
+	errs := Valid(object)
+	if len(errs) > 0 {
+		return errs[0]
+	} else {
+		return ""
+	}
 }
 
 // custom validation
 
-func userName(f validator.FieldLevel) bool {
+func userNameIgnoreEmpty(f validator.FieldLevel) bool {
 	str := f.Field().String()
 	count := utf8.RuneCountInString(str)
 	if count == 0 {
 		return true
 	}
 	pattern := `^[a-zA-Z][0-9a-zA-Z_-]{4,11}$`
+	matched, _ := regexp.MatchString(pattern, str)
+	return matched
+}
+
+func emailIgnoreEmpty(f validator.FieldLevel) bool {
+	str := f.Field().String()
+	count := utf8.RuneCountInString(str)
+	if count == 0 {
+		return true
+	}
+	pattern := `^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$`
 	matched, _ := regexp.MatchString(pattern, str)
 	return matched
 }
