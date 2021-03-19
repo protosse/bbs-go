@@ -13,5 +13,6 @@ var (
 	CreateUserError    = &CodeError{1003, "创建用户失败"}
 	UsernameExistError = &CodeError{1004, "用户名已存在"}
 	UserNotExistError  = &CodeError{1005, "用户不存在"}
-	PasswordError      = &CodeError{1005, "密码错误"}
+	PasswordError      = &CodeError{1006, "密码错误"}
+	TokenError         = &CodeError{1007, "token错误"}
 )

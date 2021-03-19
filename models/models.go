@@ -3,7 +3,7 @@ package models
 import "database/sql"
 
 var Models = []interface{}{
-	&User{}, &UserToken{}, &Topic{}, &TopicNode{}, &Comment{},
+	&User{}, &Topic{}, &TopicNode{}, &Comment{},
 }
 
 type Model struct {
@@ -29,14 +29,6 @@ type User struct {
 	UpdateTime       int64          // 更新时间
 }
 
-type UserToken struct {
-	Model
-	Token      string `gorm:"size:32;unique;not null"`
-	UserId     int64  `gorm:"not null;index:idx_user_token_user_id;"`
-	ExpiredAt  int64  `gorm:"not null"`
-	Status     int    `gorm:"not null;index:idx_user_token_status"`
-	CreateTime int64  `gorm:"not null"`
-}
 type Topic struct {
 	Model
 	NodeId            int64  `gorm:"not null;index:idx_node_id;"`       // 节点编号
@@ -52,6 +44,7 @@ type Topic struct {
 	CreateTime        int64  `gorm:"index:idx_topic_create_time"` // 创建时间
 	ExtraData         string `gorm:"type:text"`                   // 扩展数据
 }
+
 type TopicNode struct {
 	Model
 	Name        string `gorm:"size:32;unique"` // 名称
@@ -60,6 +53,7 @@ type TopicNode struct {
 	Status      int    `gorm:"not null"`          // 状态
 	CreateTime  int64  // 创建时间
 }
+
 type Comment struct {
 	Model
 	UserId      int64  `gorm:"index:idx_comment_user_id;not null"`     // 用户编号

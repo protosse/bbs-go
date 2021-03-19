@@ -76,6 +76,7 @@ func (c *LoginController) PostLogin() *common.JsonResult {
 		return common.JsonError(common.PasswordError)
 	}
 
-	return common.JsonSuccess()
+	res := &param.PostLoginRes{}
 
+	return common.JsonData(res)
 }
