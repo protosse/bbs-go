@@ -3,6 +3,8 @@ package services
 import (
 	"bbs-go/models"
 	"bbs-go/repositories"
+	"bbs-go/services/auth"
+
 	"github.com/iris-contrib/middleware/jwt"
 	"github.com/kataras/iris/v12"
 )
@@ -33,9 +35,15 @@ func (s *user) Create(m *models.User) (err error) {
 }
 
 func (s *user) GetCurrent(ctx iris.Context) *models.User {
-	jwtInfo := ctx.Values().Get("jwt").(*jwt.Token)
-	claims := jwtInfo.Claims.(jwt.MapClaims)
-	//TODO: no userId
-	userId := int64(claims["userId"].(float64))
-	return s.GetBy(userId)
+	token := ctx.Values().Get("jwt").(*jwt.Token).Raw
+	session, err := auth.Driver().GetSession(token)
+	if err != nil {
+		return nil
+	}
+
+	return s.GetBy(session.UserId)
+}
+
+func (s *user) Login(token string, id int64) (err error) {
+	return auth.Driver().ToCache(token, id)
 }

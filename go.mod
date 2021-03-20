@@ -13,7 +13,7 @@ require (
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/iris-contrib/go.uuid v2.0.0+incompatible
 	github.com/iris-contrib/middleware/cors v0.0.0-20210110101738-6d0a4d799b5d
-	github.com/iris-contrib/middleware/jwt v0.0.0-20210110101738-6d0a4d799b5d // indirect
+	github.com/iris-contrib/middleware/jwt v0.0.0-20210110101738-6d0a4d799b5d
 	github.com/kataras/golog v0.1.7 // indirect
 	github.com/kataras/iris/v12 v12.2.0-alpha2
 	github.com/klauspost/compress v1.11.12 // indirect
@@ -23,6 +23,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/nats-io/jwt v1.2.2 // indirect
 	github.com/nats-io/nats-server/v2 v2.1.9 // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sirupsen/logrus v1.8.1
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/tdewolff/minify/v2 v2.9.13 // indirect

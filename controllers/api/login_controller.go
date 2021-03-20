@@ -81,6 +81,11 @@ func (c *LoginController) PostLogin() *common.JsonResult {
 		return common.JsonError(common.GenerateTokenError)
 	}
 
+	err = services.User.Login(token, user.Id)
+	if err != nil {
+		return common.JsonError(common.GenerateTokenError)
+	}
+
 	res := &models.PostLoginRes{
 		UserResponse: models.NewUserResponseFromModel(user),
 		Token:        token,
