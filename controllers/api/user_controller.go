@@ -2,7 +2,7 @@ package api
 
 import (
 	"bbs-go/common"
-	"bbs-go/middleware"
+	"bbs-go/models"
 	"bbs-go/services"
 	"github.com/kataras/iris/v12"
 )
@@ -16,15 +16,6 @@ func (c *UserController) GetCurrent() *common.JsonResult {
 	if user == nil {
 		return common.JsonError(common.UserNotExistError)
 	}
-	return common.JsonData(user)
-}
-
-func (c *UserController) GetToken() *common.JsonResult {
-	token, err := middleware.GenerateJwtToken()
-	if err != nil {
-		return common.JsonError(common.GenerateTokenError)
-	}
-	return common.JsonData(map[string]string{
-		"token": token,
-	})
+	res := models.NewUserResponseFromModel(user)
+	return common.JsonData(res)
 }

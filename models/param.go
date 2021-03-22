@@ -14,5 +14,6 @@ type PostLoginReq struct {
 
 type PostLoginRes struct {
 	*UserResponse
-	Token string `json:"token"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }

@@ -9,9 +9,9 @@ import (
 )
 
 func Init() {
-	if file, err := os.OpenFile(config.Config.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
+	if file, err := os.OpenFile(config.Global.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
 		logrus.SetOutput(io.MultiWriter(os.Stdout, file))
-		switch config.Config.LogLevel {
+		switch config.Global.LogLevel {
 		default:
 			logrus.SetLevel(logrus.DebugLevel)
 		}

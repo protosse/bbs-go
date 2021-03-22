@@ -5,7 +5,7 @@ import (
 	"bbs-go/repositories"
 	"bbs-go/services/auth"
 
-	"github.com/iris-contrib/middleware/jwt"
+	"bbs-go/middleware/jauth"
 	"github.com/kataras/iris/v12"
 )
 
@@ -35,15 +35,19 @@ func (s *user) Create(m *models.User) (err error) {
 }
 
 func (s *user) GetCurrent(ctx iris.Context) *models.User {
-	token := ctx.Values().Get("jwt").(*jwt.Token).Raw
-	session, err := auth.Driver().GetSession(token)
-	if err != nil {
-		return nil
-	}
-
-	return s.GetBy(session.UserId)
+	userId := ctx.Values().Get("userId").(int64)
+	return s.GetBy(userId)
 }
 
-func (s *user) Login(token string, id int64) (err error) {
-	return auth.Driver().ToCache(token, id)
+func (s *user) CreateToken(userId int64) (token *jauth.Token, err error) {
+	token, err = jauth.CreateToken(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = auth.Driver().ToCache(userId, token)
+	if err != nil {
+		return nil, err
+	}
+	return
 }

@@ -4,18 +4,13 @@ import "C"
 import (
 	"bbs-go/app"
 	"bbs-go/common/config"
-	"bbs-go/models"
-	"bbs-go/services"
 	"bbs-go/util/logging"
 	"flag"
 	"fmt"
-
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
 var (
-	configFile = flag.String("config", "./config.yaml", "配置文件路径")
+	configFile = flag.String("config", config.DefaultPath, "配置文件路径")
 )
 
 func init() {
@@ -32,19 +27,13 @@ func init() {
 	// 初始化日志
 	logging.Init()
 
-	gormConf := &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   config.Config.DB.Prefix,
-			SingularTable: true,
-		},
-	}
-
-	// 连接数据库
-	if err = services.OpenDB(config.Config.DB.Conn, gormConf, 10, 20, models.Models...); err != nil {
+	// 初始化数据库
+	err = app.NewGormServer(config.Global).Connect()
+	if err != nil {
 		logging.Errorf("connect db failed: %v", err)
 	}
 }
 
 func main() {
-	app.InitIris()
+	app.NewIrisServer(config.Global).Run()
 }

@@ -2,12 +2,12 @@ package auth
 
 import (
 	"bbs-go/common/config"
+	"bbs-go/middleware/jauth"
 	"errors"
 )
 
 var (
-	SessionTokenPrefix = "GB:"
-	ErrTokenInvalid    = errors.New("无效的token")
+	ErrTokenInvalid = errors.New("无效的token")
 )
 
 var authDriver Authentication
@@ -17,21 +17,15 @@ func Driver() Authentication {
 		return authDriver
 	}
 
-	switch config.Config.Cache.Driver {
+	switch config.Global.Cache.Driver {
 	default:
 		return NewLocalAuth()
 	}
 }
 
 type Authentication interface {
-	ToCache(token string, id int64) error
-	GetSession(token string) (*Session, error)
+	ToCache(userId int64, token *jauth.Token) error
+	GetUserId(uuid string) (int64, error)
+	DelCache(uuid string) (int64, error)
 	Close()
-}
-
-type Session struct {
-	UserId    int64  `json:"userId" redis:"userId"`
-	CreatDate int64  `json:"creatDate" redis:"creatDate"`
-	ExpiresIn int64  `json:"expiresIn" redis:"expiresIn"`
-	Scope     uint64 `json:"scope" redis:"scope"`
 }

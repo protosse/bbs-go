@@ -2,6 +2,7 @@ package auth
 
 import (
 	"bbs-go/common/constants"
+	"bbs-go/middleware/jauth"
 	"time"
 
 	"github.com/patrickmn/go-cache"
@@ -13,33 +14,35 @@ type LocalAuth struct {
 	Cache *cache.Cache
 }
 
-func cureKey(key string) string {
-	return SessionTokenPrefix + key
-}
-
-func (l *LocalAuth) ToCache(token string, id int64) error {
-	key := cureKey(token)
-	session := &Session{
-		UserId:    id,
-		CreatDate: time.Now().Unix(),
-	}
-	l.Cache.Set(key, session, 0)
+func (l *LocalAuth) ToCache(userId int64, token *jauth.Token) error {
+	now := time.Now()
+	l.Cache.Set(token.AccessUuid, userId, time.Unix(token.AccessTokenExpires, 0).Sub(now))
+	l.Cache.Set(token.RefreshUuid, userId, time.Unix(token.RefreshTokenExpires, 0).Sub(now))
 	return nil
 }
 
-func (l *LocalAuth) GetSession(token string) (*Session, error) {
-	get, found := l.Cache.Get(cureKey(token))
+func (l *LocalAuth) GetUserId(uuid string) (int64, error) {
+	userId, found := l.Cache.Get(uuid)
 	if !found {
-		return nil, ErrTokenInvalid
+		return 0, ErrTokenInvalid
 	}
-	return get.(*Session), nil
+	return userId.(int64), nil
+}
+
+func (l *LocalAuth) DelCache(uuid string) (int64, error) {
+	userId, err := l.GetUserId(uuid)
+	if err != nil {
+		return 0, err
+	}
+	l.Cache.Delete(uuid)
+	return userId, nil
 }
 
 func (l *LocalAuth) Close() {}
 
 func NewLocalAuth() *LocalAuth {
 	if localCache == nil {
-		localCache = cache.New(constants.DefaultTokenExpireHour*time.Hour, 20*time.Minute)
+		localCache = cache.New(constants.AccessTokenExpireHour*time.Hour, 20*time.Minute)
 	}
 	return &LocalAuth{
 		Cache: localCache,

@@ -4,6 +4,7 @@ import (
 	"bbs-go/common/config"
 	"bbs-go/controllers/api"
 	"bbs-go/middleware"
+	"bbs-go/middleware/jauth"
 	"fmt"
 	"github.com/iris-contrib/middleware/cors"
 	"github.com/kataras/iris/v12"
@@ -12,9 +13,22 @@ import (
 	"github.com/kataras/iris/v12/mvc"
 )
 
-func InitIris() {
+type IrisServer struct {
+	App    *iris.Application
+	Config *config.Config
+}
+
+func NewIrisServer(config *config.Config) *IrisServer {
+	server := &IrisServer{
+		Config: config,
+	}
+	server.initIris()
+	return server
+}
+
+func (s *IrisServer) initIris() {
 	app := iris.New()
-	app.Logger().SetLevel(config.Config.LogLevel)
+	app.Logger().SetLevel(s.Config.LogLevel)
 	app.Use(recover.New())
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Options{
@@ -25,21 +39,21 @@ func InitIris() {
 		AllowedHeaders:   []string{"*"},
 	}))
 
-	apiRouter := app.Party("/api")
+	jwtAccessAuth := jauth.Access()
+	cacheAuth := middleware.CacheAccessAuth
 
-	auth := middleware.JwtHandler().Serve
-	{
-		mvc.Configure(apiRouter.Party("/user", auth), func(a *mvc.Application) {
-			a.Handle(new(api.UserController))
-		})
-	}
-	mvc.Configure(apiRouter.Party("/user"), func(a *mvc.Application) {
-		a.Register()
-		a.Handle(new(api.LoginController))
+	mvc.Configure(app.Party("/api"), func(m *mvc.Application) {
+		m.Party("/user").Handle(new(api.LoginController))
+		m.Router.Use(jwtAccessAuth, cacheAuth)
+		m.Party("/user").Handle(new(api.UserController))
 	})
 
-	_ = app.Run(
-		iris.Addr(fmt.Sprintf("%s:%d", config.Config.Host, config.Config.Port)),
+	s.App = app
+}
+
+func (s *IrisServer) Run() {
+	_ = s.App.Run(
+		iris.Addr(fmt.Sprintf("%s:%d", s.Config.Host, s.Config.Port)),
 		iris.WithoutServerError(iris.ErrServerClosed),
 		iris.WithConfiguration(iris.Configuration{
 			EnableOptimizations:     true,

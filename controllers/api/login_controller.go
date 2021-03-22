@@ -3,18 +3,24 @@ package api
 import (
 	"bbs-go/common"
 	"bbs-go/middleware"
+	"bbs-go/middleware/jauth"
 	"bbs-go/models"
 	"bbs-go/services"
 	"bbs-go/util"
 	"bbs-go/util/date"
 	"bbs-go/util/str"
 	"bbs-go/util/validate"
+	"github.com/kataras/iris/v12/mvc"
 
 	"github.com/kataras/iris/v12"
 )
 
 type LoginController struct {
 	Ctx iris.Context
+}
+
+func (c *LoginController) BeforeActivation(b mvc.BeforeActivation) {
+	b.Handle("Post", "/refreshToken", "RefreshToken", jauth.Refresh(), middleware.CacheRefreshAuth)
 }
 
 func (c *LoginController) PostSignup() *common.JsonResult {
@@ -76,19 +82,15 @@ func (c *LoginController) PostLogin() *common.JsonResult {
 		return common.JsonError(common.PasswordError)
 	}
 
-	token, err := middleware.GenerateJwtToken()
+	token, err := services.User.CreateToken(user.Id)
 	if err != nil {
-		return common.JsonError(common.GenerateTokenError)
-	}
-
-	err = services.User.Login(token, user.Id)
-	if err != nil {
-		return common.JsonError(common.GenerateTokenError)
+		return common.JsonError(common.CreateTokenError)
 	}
 
 	res := &models.PostLoginRes{
 		UserResponse: models.NewUserResponseFromModel(user),
-		Token:        token,
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
 	}
 	return common.JsonData(res)
 }
@@ -100,5 +102,18 @@ func (c *LoginController) GetBy(id int64) *common.JsonResult {
 	}
 
 	res := models.NewUserResponseFromModel(user)
+	return common.JsonData(res)
+}
+
+func (c *LoginController) RefreshToken() *common.JsonResult {
+	userId := c.Ctx.Values().Get("userId").(int64)
+	token, err := services.User.CreateToken(userId)
+	if err != nil {
+		return common.JsonError(common.CreateTokenError)
+	}
+	res := map[string]string{
+		"accessToken":  token.AccessToken,
+		"refreshToken": token.RefreshToken,
+	}
 	return common.JsonData(res)
 }

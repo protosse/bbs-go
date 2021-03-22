@@ -5,16 +5,16 @@ port: 8082
 maxSize: 1024 # 文件上传限制
 pprof: false
 cache:
-    driver: local # local redis
+  driver: local # local redis
 limit:
-    disable: true
-    limit: 2 # 每秒允许请求次数
-    burst: 10 # 最高允许并发
+  disable: true
+  limit: 2 # 每秒允许请求次数
+  burst: 10 # 最高允许并发
 db:
-    adapter: mysql
-    conn: root@tcp(localhost:3306)/GoBBS
-    prefix: t_
+  adapter: mysql
+  conn: root@tcp(localhost:3306)/GoBBS
+  prefix: t_
 redis:
-    host: localhost
-    port: 6379
-    password:
+  host: localhost
+  port: 6379
+  password:
