@@ -4,6 +4,7 @@ import "C"
 import (
 	"bbs-go/app"
 	"bbs-go/common/config"
+	"bbs-go/services/auth"
 	"bbs-go/util/logging"
 	"flag"
 	"fmt"
@@ -31,6 +32,11 @@ func init() {
 	err = app.NewGormServer(config.Global).Connect()
 	if err != nil {
 		logging.Errorf("connect db failed: %v", err)
+	}
+
+	// 如果使用redis作为缓存，则初始化redis
+	if config.Global.Cache.Driver == "redis" {
+		auth.InitRedisCluster([]string{fmt.Sprintf("%s:%d", config.Global.Redis.Host, config.Global.Redis.Port)}, config.Global.Redis.Password)
 	}
 }
 
