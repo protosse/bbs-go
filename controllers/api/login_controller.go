@@ -8,6 +8,7 @@ import (
 	"bbs-go/services"
 	"bbs-go/util"
 	"bbs-go/util/date"
+	"bbs-go/util/logging"
 	"bbs-go/util/str"
 	"bbs-go/util/validate"
 	"github.com/kataras/iris/v12/mvc"
@@ -84,6 +85,7 @@ func (c *LoginController) PostLogin() *common.JsonResult {
 
 	token, err := services.User.CreateToken(user.Id)
 	if err != nil {
+		logging.Errorf("%v", err)
 		return common.JsonError(common.CreateTokenError)
 	}
 

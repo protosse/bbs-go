@@ -18,8 +18,12 @@ func Driver() Authentication {
 	}
 
 	switch config.Global.Cache.Driver {
+	case "redis":
+		authDriver = NewRedisAuth(config.Global)
+		return authDriver
 	default:
-		return NewLocalAuth()
+		authDriver = NewLocalAuth()
+		return authDriver
 	}
 }
 
